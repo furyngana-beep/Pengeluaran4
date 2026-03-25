@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Catatan Keuangan</title>
+
+<style>
+* {
+  box-sizing: border-box;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+body {
+  margin: 0;
+  background: #eef2f7;
+}
+
+/* HEADER */
+.header {
+  background: linear-gradient(135deg, #2193b0, #6dd5ed);
+  color: white;
+  padding: 20px;
+  font-size: 20px;
+  font-weight: bold;
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
+}
+
+/* CONTAINER */
+.container {
+  padding: 15px;
+  margin-top: -10px;
+}
+
+/* CARD */
+.card {
+  background: white;
+  padding: 15px;
+  border-radius: 18px;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+  margin-bottom: 15px;
+}
+
+/* SALDO */
+.saldo {
+  text-align: center;
+}
+
+.saldo span {
+  font-size: 24px;
+  font-weight: bold;
+  color: #2193b0;
+}
+
+/* INPUT */
+input, select {
+  width: 100%;
+  padding: 13px;
+  margin-top: 10px;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+}
+
+/* BUTTON */
+button {
+  width: 100%;
+  padding: 13px;
+  border-radius: 12px;
+  border: none;
+  font-weight: bold;
+  margin-top: 12px;
+}
+
+.btn-add {
+  background: linear-gradient(135deg, #2193b0, #6dd5ed);
+  color: white;
+}
+
+.btn-reset {
+  background: #ff4d4d;
+  color: white;
+}
+
+/* LIST */
+.list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  border-radius: 14px;
+  background: #f9fbfd;
+  margin-top: 10px;
+  transition: 0.2s;
+}
+
+.list-item:hover {
+  transform: scale(1.02);
+}
+
+/* INFO */
+.item-info b {
+  font-size: 15px;
+}
+
+.item-info span {
+  font-size: 12px;
+  color: #888;
+}
+
+/* VALUE */
+.income {
+  color: #00a86b;
+  font-weight: bold;
+}
+
+.expense {
+  color: #ff4d4d;
+  font-weight: bold;
+}
+
+/* DELETE */
+.delete-btn {
+  background: none;
+  font-size: 18px;
+  color: #ff4d4d;
+}
+
+/* MODAL */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.4);
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 15px;
+  width: 80%;
+  text-align: center;
+}
+
+.modal-content button {
+  width: 40%;
+  margin: 5px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">💰 Catatan Keuangan</div>
+
+<div class="container">
+
+  <div class="card saldo">
+    Saldo<br>
+    <span>Rp <span id="saldo">0</span></span>
+  </div>
+
+  <div class="card">
+    <select id="tipe">
+      <option value="pemasukan">Pemasukan</option>
+      <option value="pengeluaran">Pengeluaran</option>
+    </select>
+
+    <input type="text" id="keterangan" placeholder="Keterangan">
+    <input type="number" id="harga" placeholder="Jumlah (Rp)">
+    <input type="date" id="tanggal">
+
+    <button class="btn-add" onclick="tambah()">+ Tambah</button>
+  </div>
+
+  <div class="card" id="list"></div>
+
+  <button class="btn-reset" onclick="showModal()">Reset Data</button>
+
+</div>
+
+<div class="modal" id="modal">
+  <div class="modal-content">
+    <p>Yakin ingin reset semua data?</p>
+    <button onclick="resetData()">Ya</button>
+    <button onclick="hideModal()">Tidak</button>
+  </div>
+</div>
+
+<script>
+let transaksi = JSON.parse(localStorage.getItem("data")) || [];
+
+/* 🔥 FORMAT HARI & BULAN */
+function formatTanggal(tgl) {
+  const hari = ["Minggu","Senin","Selasa","Rabu","Kamis","Jumat","Sabtu"];
+  const bulan = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
+
+  const date = new Date(tgl);
+  const namaHari = hari[date.getDay()];
+  const tanggal = date.getDate();
+  const namaBulan = bulan[date.getMonth()];
+
+  return `${namaHari}, ${tanggal} ${namaBulan}`;
+}
+
+function render() {
+  const list = document.getElementById("list");
+  const saldoEl = document.getElementById("saldo");
+
+  list.innerHTML = "";
+  let saldo = 0;
+
+  transaksi.forEach((item, index) => {
+    saldo += item.tipe === "pemasukan" ? item.harga : -item.harga;
+
+    list.innerHTML += `
+      <div class="list-item">
+        <div class="item-info">
+          <b>${item.keterangan}</b>
+          <span>${formatTanggal(item.tanggal)}</span>
+        </div>
+        <div>
+          <div class="${item.tipe === 'pemasukan' ? 'income' : 'expense'}">
+            ${item.tipe === 'pemasukan' ? '+' : '-'}Rp ${item.harga.toLocaleString()}
+          </div>
+          <button class="delete-btn" onclick="hapus(${index})">🗑</button>
+        </div>
+      </div>
+    `;
+  });
+
+  saldoEl.textContent = saldo.toLocaleString();
+  localStorage.setItem("data", JSON.stringify(transaksi));
+}
+
+function tambah() {
+  const tipe = document.getElementById("tipe").value;
+  const keterangan = document.getElementById("keterangan").value;
+  const harga = parseInt(document.getElementById("harga").value);
+  const tanggal = document.getElementById("tanggal").value;
+
+  if (!keterangan || !harga || !tanggal) {
+    alert("Isi semua data!");
+    return;
+  }
+
+  transaksi.push({ tipe, keterangan, harga, tanggal });
+
+  document.getElementById("keterangan").value = "";
+  document.getElementById("harga").value = "";
+  document.getElementById("tanggal").value = "";
+
+  render();
+}
+
+function hapus(index) {
+  transaksi.splice(index, 1);
+  render();
+}
+
+function showModal() {
+  document.getElementById("modal").style.display = "flex";
+}
+
+function hideModal() {
+  document.getElementById("modal").style.display = "none";
+}
+
+function resetData() {
+  transaksi = [];
+  render();
+  hideModal();
+}
+
+render();
+</script>
+
+</body>
+</html>
