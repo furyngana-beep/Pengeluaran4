@@ -112,8 +112,9 @@ button {
 
 /* VALUE */
 .income {
-  color: #00a86b;
+  color: #00d86b;
   font-weight: bold;
+  
 }
 
 .expense {
@@ -195,17 +196,35 @@ button {
 <script>
 let transaksi = JSON.parse(localStorage.getItem("data")) || [];
 
-/* 🔥 FORMAT HARI & BULAN */
+/* 🔥 FORMAT HARI + BULAN + TAHUN */
 function formatTanggal(tgl) {
   const hari = ["Minggu","Senin","Selasa","Rabu","Kamis","Jumat","Sabtu"];
   const bulan = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
 
   const date = new Date(tgl);
-  const namaHari = hari[date.getDay()];
-  const tanggal = date.getDate();
-  const namaBulan = bulan[date.getMonth()];
+  return `${hari[date.getDay()]}, ${date.getDate()} ${bulan[date.getMonth()]} ${date.getFullYear()}`;
+}
 
-  return `${namaHari}, ${tanggal} ${namaBulan}`;
+/* 🔥 GROUP BY BULAN */
+function groupByBulan(data) {
+  const bulan = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
+  let hasil = {};
+
+  data.forEach(item => {
+    let date = new Date(item.tanggal);
+    let key = `${bulan[date.getMonth()]} ${date.getFullYear()}`;
+
+    if (!hasil[key]) {
+      hasil[key] = {
+        pemasukan: [],
+        pengeluaran: []
+      };
+    }
+
+    hasil[key][item.tipe].push(item);
+  });
+
+  return hasil;
 }
 
 function render() {
@@ -215,29 +234,70 @@ function render() {
   list.innerHTML = "";
   let saldo = 0;
 
-  transaksi.forEach((item, index) => {
+  /* hitung saldo tetap sama */
+  transaksi.forEach(item => {
     saldo += item.tipe === "pemasukan" ? item.harga : -item.harga;
+  });
 
-    list.innerHTML += `
-      <div class="list-item">
-        <div class="item-info">
-          <b>${item.keterangan}</b>
-          <span>${formatTanggal(item.tanggal)}</span>
-        </div>
-        <div>
-          <div class="${item.tipe === 'pemasukan' ? 'income' : 'expense'}">
-            ${item.tipe === 'pemasukan' ? '+' : '-'}Rp ${item.harga.toLocaleString()}
-          </div>
-          <button class="delete-btn" onclick="hapus(${index})">🗑</button>
-        </div>
-      </div>
+  /* grouping */
+  const grouped = groupByBulan(transaksi);
+
+  Object.keys(grouped).reverse().forEach(bulanKey => {
+    const group = grouped[bulanKey];
+
+    let section = `<div style="margin-top:15px;">
+      <h3 style="margin:10px 0;color:#2193b0;">📅 ${bulanKey}</h3>
     `;
+
+    /* PEMASUKAN */
+    if (group.pemasukan.length > 0) {
+      section += `<div style="font-weight:bold;color:green;margin-top:5px;"></div>`;
+      group.pemasukan.forEach(item => {
+        let index = transaksi.indexOf(item);
+
+        section += `
+        <div class="list-item">
+          <div class="item-info">
+            <p>${item.keterangan}</p>
+            <span>${formatTanggal(item.tanggal)}</span>
+          </div>
+          <div>
+            <div class="income">+Rp ${item.harga.toLocaleString()}</div>
+            <button class="delete-btn" onclick="hapus(${index})">🗑</button>
+          </div>
+        </div>`;
+      });
+    }
+
+    /* PENGELUARAN */
+    if (group.pengeluaran.length > 0) {
+      section += `<div style="font-weight:bold;color:red;margin-top:10px;"></div>`;
+      group.pengeluaran.forEach(item => {
+        let index = transaksi.indexOf(item);
+
+        section += `
+        <div class="list-item">
+          <div class="item-info">
+            <p>${item.keterangan}</p>
+            <span>${formatTanggal(item.tanggal)}</span>
+          </div>
+          <div>
+            <div class="expense">-Rp ${item.harga.toLocaleString()}</div>
+            <button class="delete-btn" onclick="hapus(${index})">🗑</button>
+          </div>
+        </div>`;
+      });
+    }
+
+    section += `</div>`;
+    list.innerHTML += section;
   });
 
   saldoEl.textContent = saldo.toLocaleString();
   localStorage.setItem("data", JSON.stringify(transaksi));
 }
 
+/* fungsi lama tetap */
 function tambah() {
   const tipe = document.getElementById("tipe").value;
   const keterangan = document.getElementById("keterangan").value;
@@ -281,4 +341,4 @@ render();
 </script>
 
 </body>
-</html>
+      </html>
