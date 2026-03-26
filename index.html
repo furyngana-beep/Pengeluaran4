@@ -1,344 +1,328 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DompetKu Mobile - Grouped</title>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --success: #22c55e;
+            --danger: #ef4444;
+            --dark: #1e293b;
+            --light: #f8fafc;
+        }
 
-<title>Catatan Keuangan</title>
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-<style>
-* {
-  box-sizing: border-box;
-  font-family: 'Segoe UI', sans-serif;
-}
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f8fafc;
+            color: var(--dark);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+        }
 
-body {
-  margin: 0;
-  background: #eef2f7;
-}
+        .container {
+            width: 100%;
+            max-width: 480px;
+            min-height: 100vh;
+            background: white;
+            padding: 1.5rem;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+        }
 
-/* HEADER */
-.header {
-  background: linear-gradient(135deg, #2193b0, #6dd5ed);
-  color: white;
-  padding: 20px;
-  font-size: 20px;
-  font-weight: bold;
-  border-bottom-left-radius: 20px;
-  border-bottom-right-radius: 20px;
-}
+        h2 { text-align: center; font-weight: 800; margin-top: 0; color: var(--primary); }
 
-/* CONTAINER */
-.container {
-  padding: 15px;
-  margin-top: -10px;
-}
+        .balance-card {
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 1.2rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3);
+        }
 
-/* CARD */
-.card {
-  background: white;
-  padding: 15px;
-  border-radius: 18px;
-  box-shadow: 0 6px 15px rgba(0,0,0,0.08);
-  margin-bottom: 15px;
-}
+        .balance-card h1 { margin: 0.5rem 0; font-size: 1.8rem; letter-spacing: -1px; }
 
-/* SALDO */
-.saldo {
-  text-align: center;
-}
+        .type-selector {
+            display: flex;
+            background: #f1f5f9;
+            padding: 5px;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
 
-.saldo span {
-  font-size: 24px;
-  font-weight: bold;
-  color: #2193b0;
-}
+        .type-option {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: 0.3s;
+        }
 
-/* INPUT */
-input, select {
-  width: 100%;
-  padding: 13px;
-  margin-top: 10px;
-  border-radius: 12px;
-  border: 1px solid #ddd;
-  font-size: 14px;
-}
+        .type-option.active.plus { background: var(--success); color: white; }
+        .type-option.active.minus { background: var(--danger); color: white; }
 
-/* BUTTON */
-button {
-  width: 100%;
-  padding: 13px;
-  border-radius: 12px;
-  border: none;
-  font-weight: bold;
-  margin-top: 12px;
-}
+        .form-group { margin-bottom: 1rem; }
+        label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.85rem; color: #64748b; }
 
-.btn-add {
-  background: linear-gradient(135deg, #2193b0, #6dd5ed);
-  color: white;
-}
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1rem;
+            outline: none;
+        }
 
-.btn-reset {
-  background: #ff4d4d;
-  color: white;
-}
+        .btn-group { display: flex; gap: 10px; margin-top: 1.2rem; }
 
-/* LIST */
-.list-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px;
-  border-radius: 14px;
-  background: #f9fbfd;
-  margin-top: 10px;
-  transition: 0.2s;
-}
+        button {
+            flex: 2;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+        }
 
-.list-item:hover {
-  transform: scale(1.02);
-}
+        .btn-add { background: var(--primary); color: white; }
+        .btn-reset { flex: 1; background: #f1f5f9; color: #64748b; }
 
-/* INFO */
-.item-info b {
-  font-size: 15px;
-}
+        /* Style Grouping */
+        .month-group {
+            margin-top: 1.5rem;
+        }
 
-.item-info span {
-  font-size: 12px;
-  color: #888;
-}
+        .month-header {
+            background: #f8fafc;
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #64748b;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            border-left: 3px solid #cbd5e1;
+        }
 
-/* VALUE */
-.income {
-  color: #00d86b;
-  font-weight: bold;
-  
-}
+        .list { list-style: none; padding: 0; margin: 0; }
 
-.expense {
-  color: #ff4d4d;
-  font-weight: bold;
-}
+        .item {
+            background: #fff;
+            border: 1px solid #f1f5f9;
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-/* DELETE */
-.delete-btn {
-  background: none;
-  font-size: 18px;
-  color: #ff4d4d;
-}
+        .item.plus { border-right: 4px solid var(--success); }
+        .item.minus { border-right: 4px solid var(--danger); }
 
-/* MODAL */
-.modal {
-  display: none;
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.4);
-  justify-content: center;
-  align-items: center;
-}
+        .item-info strong { display: block; font-size: 0.95rem; }
+        .item-info span { font-size: 0.75rem; color: #94a3b8; }
 
-.modal-content {
-  background: white;
-  padding: 20px;
-  border-radius: 15px;
-  width: 80%;
-  text-align: center;
-}
+        .amount-text { font-weight: 700; font-size: 0.9rem; }
+        .amount-text.plus { color: var(--success); }
+        .amount-text.minus { color: var(--danger); }
 
-.modal-content button {
-  width: 40%;
-  margin: 5px;
-}
-</style>
+        .delete-btn {
+            margin-left: 10px;
+            background: #fff1f2;
+            color: var(--danger);
+            border: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            align-items: center; justify-content: center;
+            z-index: 100;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 1.2rem;
+            text-align: center;
+            width: 85%;
+            max-width: 320px;
+        }
+    </style>
 </head>
-
 <body>
 
-<div class="header">💰 Catatan Keuangan</div>
-
 <div class="container">
+    <h2>DompetKu</h2>
 
-  <div class="card saldo">
-    Saldo<br>
-    <span>Rp <span id="saldo">0</span></span>
-  </div>
+    <div class="balance-card">
+        <small>Sisa Saldo Kamu</small>
+        <h1 id="balance">Rp 0</h1>
+    </div>
 
-  <div class="card">
-    <select id="tipe">
-      <option value="pemasukan">Pemasukan</option>
-      <option value="pengeluaran">Pengeluaran</option>
-    </select>
+    <div class="type-selector">
+        <div id="optPlus" class="type-option active plus" onclick="setType('plus')">Pemasukan</div>
+        <div id="optMinus" class="type-option minus" onclick="setType('minus')">Pengeluaran</div>
+    </div>
 
-    <input type="text" id="keterangan" placeholder="Keterangan">
-    <input type="number" id="harga" placeholder="Jumlah (Rp)">
-    <input type="date" id="tanggal">
+    <div class="form-group">
+        <label>Keterangan</label>
+        <input type="text" id="text" placeholder="Gaji, Kopi, dll">
+    </div>
+    <div class="form-group">
+        <label>Jumlah Uang</label>
+        <input type="number" id="amount" placeholder="0" inputmode="numeric">
+    </div>
+    <div class="form-group">
+        <label>Tanggal</label>
+        <input type="date" id="date">
+    </div>
+    
+    <div class="btn-group">
+        <button class="btn-add" onclick="addTransaction()">Simpan</button>
+        <button class="btn-reset" onclick="showModal()">Reset</button>
+    </div>
 
-    <button class="btn-add" onclick="tambah()">+ Tambah</button>
-  </div>
-
-  <div class="card" id="list"></div>
-
-  <button class="btn-reset" onclick="showModal()">Reset Data</button>
-
+    <div id="history-container">
+        </div>
 </div>
 
-<div class="modal" id="modal">
-  <div class="modal-content">
-    <p>Yakin ingin reset semua data?</p>
-    <button onclick="resetData()">Ya</button>
-    <button onclick="hideModal()">Tidak</button>
-  </div>
+<div id="resetModal" class="modal">
+    <div class="modal-content">
+        <h3>Hapus Semua Data?</h3>
+        <div class="btn-group">
+            <button style="background: var(--danger); color: white;" onclick="resetData()">Ya, Hapus</button>
+            <button class="btn-reset" onclick="hideModal()">Batal</button>
+        </div>
+    </div>
 </div>
 
 <script>
-let transaksi = JSON.parse(localStorage.getItem("data")) || [];
+    const balance = document.getElementById('balance');
+    const historyContainer = document.getElementById('history-container');
+    const text = document.getElementById('text');
+    const amount = document.getElementById('amount');
+    const dateInput = document.getElementById('date');
+    const modal = document.getElementById('resetModal');
 
-/* 🔥 FORMAT HARI + BULAN + TAHUN */
-function formatTanggal(tgl) {
-  const hari = ["Minggu","Senin","Selasa","Rabu","Kamis","Jumat","Sabtu"];
-  const bulan = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
+    let currentType = 'plus';
+    let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
 
-  const date = new Date(tgl);
-  return `${hari[date.getDay()]}, ${date.getDate()} ${bulan[date.getMonth()]} ${date.getFullYear()}`;
-}
+    const monthsFull = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+    const monthsShort = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+    const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
 
-/* 🔥 GROUP BY BULAN */
-function groupByBulan(data) {
-  const bulan = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
-  let hasil = {};
-
-  data.forEach(item => {
-    let date = new Date(item.tanggal);
-    let key = `${bulan[date.getMonth()]} ${date.getFullYear()}`;
-
-    if (!hasil[key]) {
-      hasil[key] = {
-        pemasukan: [],
-        pengeluaran: []
-      };
+    function setType(type) {
+        currentType = type;
+        document.getElementById('optPlus').classList.toggle('active', type === 'plus');
+        document.getElementById('optMinus').classList.toggle('active', type === 'minus');
     }
 
-    hasil[key][item.tipe].push(item);
-  });
-
-  return hasil;
-}
-
-function render() {
-  const list = document.getElementById("list");
-  const saldoEl = document.getElementById("saldo");
-
-  list.innerHTML = "";
-  let saldo = 0;
-
-  /* hitung saldo tetap sama */
-  transaksi.forEach(item => {
-    saldo += item.tipe === "pemasukan" ? item.harga : -item.harga;
-  });
-
-  /* grouping */
-  const grouped = groupByBulan(transaksi);
-
-  Object.keys(grouped).reverse().forEach(bulanKey => {
-    const group = grouped[bulanKey];
-
-    let section = `<div style="margin-top:15px;">
-      <h3 style="margin:10px 0;color:#2193b0;">📅 ${bulanKey}</h3>
-    `;
-
-    /* PEMASUKAN */
-    if (group.pemasukan.length > 0) {
-      section += `<div style="font-weight:bold;color:green;margin-top:5px;"></div>`;
-      group.pemasukan.forEach(item => {
-        let index = transaksi.indexOf(item);
-
-        section += `
-        <div class="list-item">
-          <div class="item-info">
-            <p>${item.keterangan}</p>
-            <span>${formatTanggal(item.tanggal)}</span>
-          </div>
-          <div>
-            <div class="income">+Rp ${item.harga.toLocaleString()}</div>
-            <button class="delete-btn" onclick="hapus(${index})">🗑</button>
-          </div>
-        </div>`;
-      });
+    function formatDateDisplay(dateStr) {
+        const d = new Date(dateStr);
+        return `${days[d.getDay()]}, ${d.getDate()} ${monthsShort[d.getMonth()]} ${d.getFullYear()}`;
     }
 
-    /* PENGELUARAN */
-    if (group.pengeluaran.length > 0) {
-      section += `<div style="font-weight:bold;color:red;margin-top:10px;"></div>`;
-      group.pengeluaran.forEach(item => {
-        let index = transaksi.indexOf(item);
-
-        section += `
-        <div class="list-item">
-          <div class="item-info">
-            <p>${item.keterangan}</p>
-            <span>${formatTanggal(item.tanggal)}</span>
-          </div>
-          <div>
-            <div class="expense">-Rp ${item.harga.toLocaleString()}</div>
-            <button class="delete-btn" onclick="hapus(${index})">🗑</button>
-          </div>
-        </div>`;
-      });
+    function formatRupiah(num) {
+        return 'Rp ' + Math.abs(num).toLocaleString('id-ID');
     }
 
-    section += `</div>`;
-    list.innerHTML += section;
-  });
+    function addTransaction() {
+        if (text.value.trim() === '' || amount.value.trim() === '' || dateInput.value === '') return;
 
-  saldoEl.textContent = saldo.toLocaleString();
-  localStorage.setItem("data", JSON.stringify(transaksi));
-}
+        const val = Math.abs(+amount.value);
+        const transaction = {
+            id: Math.floor(Math.random() * 1000000),
+            text: text.value,
+            amount: currentType === 'plus' ? val : -val,
+            date: dateInput.value
+        };
 
-/* fungsi lama tetap */
-function tambah() {
-  const tipe = document.getElementById("tipe").value;
-  const keterangan = document.getElementById("keterangan").value;
-  const harga = parseInt(document.getElementById("harga").value);
-  const tanggal = document.getElementById("tanggal").value;
+        transactions.push(transaction);
+        updateLocalStorage();
+        init();
+        text.value = ''; amount.value = '';
+    }
 
-  if (!keterangan || !harga || !tanggal) {
-    alert("Isi semua data!");
-    return;
-  }
+    function removeTransaction(id) {
+        transactions = transactions.filter(t => t.id !== id);
+        updateLocalStorage();
+        init();
+    }
 
-  transaksi.push({ tipe, keterangan, harga, tanggal });
+    function init() {
+        historyContainer.innerHTML = '';
+        const total = transactions.reduce((acc, item) => acc + item.amount, 0);
+        balance.innerText = 'Rp ' + total.toLocaleString('id-ID');
 
-  document.getElementById("keterangan").value = "";
-  document.getElementById("harga").value = "";
-  document.getElementById("tanggal").value = "";
+        // Urutkan transaksi berdasarkan tanggal terbaru
+        const sorted = [...transactions].sort((a, b) => new Date(b.date) - new Date(a.date));
 
-  render();
-}
+        // Pengelompokan berdasarkan Bulan & Tahun
+        const groups = sorted.reduce((acc, t) => {
+            const d = new Date(t.date);
+            const key = `${monthsFull[d.getMonth()]} ${d.getFullYear()}`;
+            if (!acc[key]) acc[key] = [];
+            acc[key].push(t);
+            return acc;
+        }, {});
 
-function hapus(index) {
-  transaksi.splice(index, 1);
-  render();
-}
+        for (const monthYear in groups) {
+            const groupDiv = document.createElement('div');
+            groupDiv.className = 'month-group';
+            groupDiv.innerHTML = `<div class="month-header">${monthYear}</div>`;
+            
+            const ul = document.createElement('ul');
+            ul.className = 'list';
 
-function showModal() {
-  document.getElementById("modal").style.display = "flex";
-}
+            groups[monthYear].forEach(t => {
+                const isPlus = t.amount >= 0;
+                const li = document.createElement('li');
+                li.className = `item ${isPlus ? 'plus' : 'minus'}`;
+                li.innerHTML = `
+                    <div class="item-info">
+                        <strong>${t.text}</strong>
+                        <span>${formatDateDisplay(t.date)}</span>
+                    </div>
+                    <div style="display: flex; align-items: center;">
+                        <span class="amount-text ${isPlus ? 'plus' : 'minus'}">
+                            ${isPlus ? '+' : '-'}${formatRupiah(t.amount)}
+                        </span>
+                        <button class="delete-btn" onclick="removeTransaction(${t.id})">×</button>
+                    </div>
+                `;
+                ul.appendChild(li);
+            });
+            
+            groupDiv.appendChild(ul);
+            historyContainer.appendChild(groupDiv);
+        }
+    }
 
-function hideModal() {
-  document.getElementById("modal").style.display = "none";
-}
+    function updateLocalStorage() { localStorage.setItem('transactions', JSON.stringify(transactions)); }
+    function showModal() { modal.style.display = 'flex'; }
+    function hideModal() { modal.style.display = 'none'; }
+    function resetData() { transactions = []; updateLocalStorage(); init(); hideModal(); }
 
-function resetData() {
-  transaksi = [];
-  render();
-  hideModal();
-}
-
-render();
+    dateInput.valueAsDate = new Date();
+    init();
 </script>
 
 </body>
-      </html>
+</html>
